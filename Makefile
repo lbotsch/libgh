@@ -1,30 +1,28 @@
+CC=gcc
 CFLAGS=-Wall -Wextra -fsanitize=address -fsanitize=leak -g -ggdb
+BUILDDIR=build
 
 all: test examples
 
-build:
-	mkdir -p build
+$(BUILDDIR) $(BUILDDIR)/examples $(BUILDDIR)/test &:
+	mkdir -p $(BUILDDIR)/examples
+	mkdir -p $(BUILDDIR)/test
 
-EXAMPLE_SRC=$(wildcard examples/*.c)
-EXAMPLES=$(patsubst examples/%.c,build/%,$(EXAMPLE_SRC))
+EXAMPLES=$(patsubst examples/%.c,$(BUILDDIR)/examples/%,$(wildcard examples/*.c))
+$(BUILDDIR)/examples/%: examples/%.c gh.h | $(BUILDDIR)/examples
+	$(CC) $(CFLAGS) -o $@ $<
 
-${EXAMPLES}: ${EXAMPLE_SRC} gh.h build
-	gcc ${CFLAGS} -o $@ $(patsubst build/%,examples/%.c,$@)
+TESTS=$(patsubst test/%.c,$(BUILDDIR)/test/%,$(wildcard test/*.c))
+$(BUILDDIR)/test/%: test/%.c gh.h | $(BUILDDIR)/test
+	$(CC) $(CFLAGS) -o $@ $<
 
-TEST_SRC=$(wildcard test/*.c)
-TESTS=$(patsubst test/%.c,build/%,$(TEST_SRC))
-T=$(patsubst test/%.c,%_test,$(TEST_SRC))
+RUNTESTS=$(patsubst $(BUILDDIR)/test/%,run_%,$(TESTS))
+run_%: $(BUILDDIR)/test/%
+	@$(BUILDDIR)/test/$* && echo -e "[TEST] $*: \033[32mOK\033[0m" || echo -e "[TEST] $*: \033[31mFAILED\033[0m"
 
-${TESTS}: ${TEST_SRC} gh.h build
-	gcc ${CFLAGS} -o $@ $(patsubst build/%,test/%.c,$@)
-
-${T}: ${TESTS}
-	@./$(patsubst %_test,build/%,$@) && echo -e "[TEST] $@: \033[32mOK\033[0m" || echo -e "[TEST] $@: \033[31mFAILED\033[0m"
-
-test: ${T}
+test: ${RUNTESTS}
 examples: ${EXAMPLES}
 
+.PHONY: clean test examples all
 clean:
-	rm -rf build
-
-.PHONY: ${T} test examples clean
+	rm -rf $(BUILDDIR)
