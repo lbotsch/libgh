@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -fsanitize=address -fsanitize=leak -g -ggdb
+C_FLAGS=-std=c99 -Wall -Wextra
+C_DBGFLAGS=-fsanitize=address -fsanitize=leak -g -ggdb
 BUILDDIR=build
 
 all: test examples
@@ -10,11 +11,11 @@ $(BUILDDIR) $(BUILDDIR)/examples $(BUILDDIR)/test &:
 
 EXAMPLES=$(patsubst examples/%.c,$(BUILDDIR)/examples/%,$(wildcard examples/*.c))
 $(BUILDDIR)/examples/%: examples/%.c gh.h | $(BUILDDIR)/examples
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(C_FLAGS) -o $@ $<
 
 TESTS=$(patsubst test/%.c,$(BUILDDIR)/test/%,$(wildcard test/*.c))
 $(BUILDDIR)/test/%: test/%.c gh.h | $(BUILDDIR)/test
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(C_FLAGS) $(C_DBGFLAGS) -o $@ $<
 
 RUNTESTS=$(patsubst $(BUILDDIR)/test/%,run_%,$(TESTS))
 run_%: $(BUILDDIR)/test/%

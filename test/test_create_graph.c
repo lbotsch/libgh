@@ -12,7 +12,9 @@ int main(void) {
   assert(gh.nodes[0].size == 1);
   assert(gh.nodes[0].nodes[0] == 1);
   assert(gh.nodes[0].weights[0] == 1);
+
   add_edge(&gh, 0, 1, 2);
+  printf("nodelist size = %ld\n", gh.nodes[0].size);
   assert(gh.nodes[0].size == 1);
   assert(gh.nodes[0].nodes[0] == 1);
   assert(gh.nodes[0].weights[0] == 2);
