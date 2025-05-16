@@ -1,4 +1,4 @@
-# 📊 libgh - A Single-Header Graph Algorithms Library written in C
+# 📊 gh.h - A Single-Header Graph Algorithms Library written in C
 
 `gh.h` is a lightweight, easy-to-integrate single-header library for common graph algorithms written in pure C.
 It is designed for performance and portability, suitable for embedding into projects without external dependencies.
